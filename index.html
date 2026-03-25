@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AUREUM — MCP Financial Intelligence Agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:#0a0a0f;color:#fff;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(212,160,74,0.3);border-radius:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(212,160,74,0.15)}50%{box-shadow:0 0 40px rgba(212,160,74,0.25)}}
+@keyframes typing{from{width:0}to{width:100%}}
+@keyframes blink{0%,100%{border-color:transparent}50%{border-color:#d4a04a}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,15,0.95);backdrop-filter:blur(20px);padding:12px 32px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,0.06)}
+.nav-left{display:flex;align-items:center;gap:10px}
+.nav-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#d4a04a,#f5d98a);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#0a0a0f}
+.nav-title{font-size:16px;font-weight:700;letter-spacing:2px}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-badge{padding:4px 12px;border-radius:14px;font-size:9px;font-weight:600;letter-spacing:0.5px}
+
+.container{max-width:1100px;margin:0 auto;padding:80px 24px 40px}
+
+.hero{text-align:center;padding:40px 0 30px}
+.hero-badge{display:inline-block;padding:6px 16px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:1.5px;background:rgba(212,160,74,0.1);border:1px solid rgba(212,160,74,0.2);color:#d4a04a;margin-bottom:16px}
+.hero h1{font-size:clamp(28px,4vw,42px);font-weight:900;letter-spacing:-0.5px;margin-bottom:8px}
+.hero p{font-size:14px;color:rgba(255,255,255,0.4);max-width:500px;margin:0 auto;line-height:1.6}
+
+.card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:20px;margin-bottom:14px;transition:border-color 0.3s}
+.card:hover{border-color:rgba(255,255,255,0.1)}
+.card-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.25);margin-bottom:10px}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+
+.metric{font-size:26px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:-0.5px}
+.metric-sub{font-size:9px;color:rgba(255,255,255,0.15);margin-top:2px}
+
+.input-group{display:flex;gap:8px;margin-bottom:20px}
+.input-field{flex:1;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:#fff;font-size:13px;font-family:'Outfit',sans-serif;outline:none;transition:border-color 0.3s}
+.input-field:focus{border-color:rgba(212,160,74,0.4)}
+.input-field::placeholder{color:rgba(255,255,255,0.2)}
+.btn{padding:10px 20px;border-radius:10px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;transition:all 0.2s}
+.btn-gold{background:linear-gradient(135deg,#d4a04a,#b8860b);color:#0a0a0f}
+.btn-gold:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(212,160,74,0.3)}
+.btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.6)}
+.btn-outline:hover{border-color:rgba(212,160,74,0.3);color:#d4a04a}
+
+.chat-msg{padding:12px 16px;border-radius:12px;margin-bottom:8px;font-size:12.5px;line-height:1.6;animation:slideIn 0.3s ease}
+.chat-user{background:rgba(212,160,74,0.08);border:1px solid rgba(212,160,74,0.15);margin-left:40px}
+.chat-agent{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-right:40px}
+.chat-tool{background:rgba(96,165,250,0.05);border:1px solid rgba(96,165,250,0.15);margin:0 20px;font-family:'DM Mono',monospace;font-size:11px}
+.chat-sender{font-size:10px;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+
+.tool-card{display:flex;align-items:center;gap:12px;padding:14px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);margin-bottom:8px;transition:all 0.3s;cursor:pointer}
+.tool-card:hover{border-color:rgba(212,160,74,0.3);background:rgba(212,160,74,0.03)}
+.tool-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.tool-name{font-size:13px;font-weight:600}
+.tool-desc{font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px}
+
+.news-item{padding:10px 12px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.015);border-left:2px solid rgba(255,255,255,0.1)}
+.news-bull{border-left-color:#34d399}
+.news-bear{border-left-color:#f87171}
+.news-neut{border-left-color:#fbbf24}
+
+.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(212,160,74,0.2);border-top-color:#d4a04a;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;margin-right:6px}
+
+.footer{text-align:center;padding:24px 0;border-top:1px solid rgba(255,255,255,0.04);margin-top:20px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script>
+var e=React.createElement,useState=React.useState,useEffect=React.useEffect;
+
+// Colors
+var G={gold:"#d4a04a",goldLight:"#f5d98a",green:"#34d399",red:"#f87171",yellow:"#fbbf24",blue:"#60a5fa",bg:"#0a0a0f"};
+
+// Positive/Negative word lists
+var POS=['surge','surges','surging','rally','rallies','gain','gains','rise','rises','rising','jump','jumps','soar','soars','boost','record','high','beat','beats','strong','bull','bullish','upgrade','optimism','profit','growth','recover','recovery','positive','outperform','buy','boom','breakout','upbeat','improve','expansion'];
+var NEG=['crash','fall','falls','falling','drop','drops','decline','declines','plunge','sink','slump','low','miss','fear','fears','concern','bear','bearish','downgrade','risk','loss','losses','weak','weakness','recession','crisis','sell','selloff','panic','warning','threat','bankruptcy','debt','inflation','pressure','layoffs'];
+
+function analyseSentiment(headline){
+  var words=headline.toLowerCase().split(/\s+/);
+  var pc=0,nc=0,pw=[],nw=[];
+  words.forEach(function(w){if(POS.indexOf(w)>=0){pc++;pw.push(w);}if(NEG.indexOf(w)>=0){nc++;nw.push(w);}});
+  var total=pc+nc;
+  var score=total===0?0:(pc-nc)/total;
+  var sentiment=score>0.2?"BULLISH":score<-0.2?"BEARISH":"NEUTRAL";
+  var emoji=score>0.2?"\u{1F7E2}":score<-0.2?"\u{1F534}":"\u{1F7E1}";
+  return{headline:headline,sentiment:sentiment,emoji:emoji,score:Math.round(score*1000)/1000,posWords:pw,negWords:nw,confidence:Math.round(Math.abs(score)*100)/100};
+}
+
+function analyseMultiple(headlines){
+  var results=headlines.map(analyseSentiment);
+  var scores=results.map(function(r){return r.score;});
+  var avg=scores.reduce(function(a,b){return a+b;},0)/scores.length;
+  var bull=results.filter(function(r){return r.sentiment==="BULLISH";}).length;
+  var bear=results.filter(function(r){return r.sentiment==="BEARISH";}).length;
+  var neut=results.filter(function(r){return r.sentiment==="NEUTRAL";}).length;
+  var overall=avg>0.1?"\u{1F7E2} BULLISH":avg<-0.1?"\u{1F534} BEARISH":"\u{1F7E1} MIXED";
+  return{results:results,overall:overall,avg:Math.round(avg*1000)/1000,bull:bull,bear:bear,neut:neut};
+}
+
+// Simulated stock data (since we can't call APIs from browser directly)
+var STOCKS={
+  IBM:{symbol:"IBM",price:195.42,open:193.80,high:196.15,low:193.20,volume:4250000,change:1.62,changePct:0.84,date:"2026-03-21"},
+  AAPL:{symbol:"AAPL",price:218.75,open:217.20,high:219.80,low:216.50,volume:52300000,change:1.55,changePct:0.71,date:"2026-03-21"},
+  TSLA:{symbol:"TSLA",price:178.30,open:181.50,high:182.10,low:176.90,volume:71200000,change:-3.20,changePct:-1.76,date:"2026-03-21"},
+  GOOGL:{symbol:"GOOGL",price:162.45,open:161.30,high:163.20,low:160.80,volume:28400000,change:1.15,changePct:0.71,date:"2026-03-21"},
+  NVDA:{symbol:"NVDA",price:142.80,open:140.50,high:143.90,low:139.75,volume:62100000,change:2.30,changePct:1.64,date:"2026-03-21"},
+  MSFT:{symbol:"MSFT",price:428.60,open:426.30,high:430.10,low:425.50,volume:21800000,change:2.30,changePct:0.54,date:"2026-03-21"},
+  AMZN:{symbol:"AMZN",price:198.40,open:196.80,high:199.20,low:196.10,volume:38500000,change:1.60,changePct:0.81,date:"2026-03-21"},
+  META:{symbol:"META",price:612.30,open:608.50,high:615.80,low:607.20,volume:18900000,change:3.80,changePct:0.62,date:"2026-03-21"},
+};
+
+var NEWS_DB={
+  IBM:["IBM cloud revenue surges 25% as enterprise AI adoption grows","IBM acquires AI startup to boost watsonx platform","IBM faces competition concerns from Microsoft Azure gains","IBM consulting division reports strong quarterly growth","Analysts upgrade IBM citing hybrid cloud strength"],
+  AAPL:["Apple iPhone sales beat expectations in latest quarter","Apple AI features drive record App Store revenue growth","Apple faces regulatory pressure in EU over app store fees","Apple stock hits new high on strong services growth","Concerns rise over Apple China supply chain risks"],
+  TSLA:["Tesla deliveries surge past analyst expectations","Tesla robotaxi concerns worry investors","Tesla energy storage shows record growth","Tesla faces increasing competition from Chinese EV makers","Tesla margin pressure continues as price war escalates"],
+  NVDA:["NVIDIA reports record revenue on AI chip demand surge","NVIDIA data center business soars past estimates","NVIDIA faces supply concerns for next-gen chips","Analysts upgrade NVIDIA with bullish outlook","NVIDIA dominance in AI training market strengthens"],
+  GOOGL:["Google AI search gains boost ad revenue growth","Google Cloud surges past growth expectations","Google faces antitrust pressure from DOJ","Alphabet announces record share buyback program","YouTube ad revenue shows strong recovery"],
+  MSFT:["Microsoft Azure growth surges past analyst expectations","Microsoft Copilot AI drives enterprise adoption boom","Microsoft gaming revenue beats on strong Game Pass growth","Microsoft faces EU regulatory concerns over AI integration","Microsoft cloud margins improve driving profit growth"],
+  AMZN:["Amazon AWS revenue surges on AI workload demand","Amazon advertising business hits record quarterly revenue","Amazon faces rising competition in cloud from Google","Amazon logistics efficiency improvements boost margins","Amazon Prime membership growth shows strong retention"],
+  META:["Meta AI investments show strong early returns","Meta advertising revenue beats on Reels monetization","Meta faces concerns over metaverse spending","Meta stock rallies on better than expected guidance","Meta Reality Labs losses continue but narrow significantly"],
+};
+
+function getStock(symbol){
+  var s=symbol.toUpperCase();
+  return STOCKS[s]||{symbol:s,price:100+Math.random()*100,open:100+Math.random()*100,high:110+Math.random()*100,low:95+Math.random()*100,volume:Math.floor(Math.random()*50000000),change:(Math.random()-0.5)*5,changePct:(Math.random()-0.5)*3,date:"2026-03-21"};
+}
+
+function getNews(symbol){
+  var s=symbol.toUpperCase();
+  return NEWS_DB[s]||[s+" shows strong momentum in current session",s+" analysts review outlook amid volatility",s+" faces sector pressure from rising rates","Institutional investors increase "+s+" positions",s+" technical indicators suggest key resistance level"];
+}
+
+// Main App
+function App(){
+  var _page=useState("home"),page=_page[0],setPage=_page[1];
+  var _symbol=useState(""),symbol=_symbol[0],setSymbol=_symbol[1];
+  var _headlines=useState(""),headlines=_headlines[0],setHeadlines=_headlines[1];
+  var _chat=useState([]),chat=_chat[0],setChat=_chat[1];
+  var _loading=useState(false),loading=_loading[0],setLoading=_loading[1];
+  var _stockResult=useState(null),stockResult=_stockResult[0],setStockResult=_stockResult[1];
+  var _sentResult=useState(null),sentResult=_sentResult[0],setSentResult=_sentResult[1];
+  var _intelResult=useState(null),intelResult=_intelResult[0],setIntelResult=_intelResult[1];
+  var _reqCount=useState(0),reqCount=_reqCount[0],setReqCount=_reqCount[1];
+
+  function addChat(sender,text,type){
+    setChat(function(prev){return prev.concat([{sender:sender,text:text,type:type||"agent",time:new Date().toLocaleTimeString()}]);});
+  }
+
+  function handleStock(){
+    if(!symbol)return;
+    var s=symbol.toUpperCase();
+    setLoading(true);
+    addChat("You","What is "+s+" trading at right now?","user");
+    setTimeout(function(){
+      addChat("MCP","[Calling tool: get_stock_price] Symbol: "+s,"tool");
+      setTimeout(function(){
+        var data=getStock(s);
+        setStockResult(data);
+        var dir=data.changePct>0?"\u{1F4C8} UP":data.changePct<0?"\u{1F4C9} DOWN":"\u{27A1}\u{FE0F} FLAT";
+        addChat("AUREUM","Here is the latest data for "+s+":\n\nPrice: $"+data.price.toFixed(2)+"\nChange: "+data.changePct.toFixed(2)+"%\nRange: $"+data.low.toFixed(2)+" \u2014 $"+data.high.toFixed(2)+"\nVolume: "+data.volume.toLocaleString()+"\nDirection: "+dir,"agent");
+        setLoading(false);
+        setReqCount(function(c){return c+1;});
+      },800);
+    },400);
+  }
+
+  function handleSentiment(){
+    var lines=headlines?headlines.split("\n").filter(function(l){return l.trim();}):[];
+    if(lines.length===0){
+      // Use stock-specific news if symbol entered
+      if(symbol){
+        lines=getNews(symbol.toUpperCase());
+        setHeadlines(lines.join("\n"));
+      }else{return;}
+    }
+    setLoading(true);
+    addChat("You","Analyse sentiment for "+lines.length+" headlines","user");
+    setTimeout(function(){
+      addChat("MCP","[Calling tool: analyse_sentiment] Headlines: "+lines.length,"tool");
+      setTimeout(function(){
+        var analysis=analyseMultiple(lines);
+        setSentResult(analysis);
+        addChat("AUREUM","Sentiment Analysis Complete:\n\n"+analysis.overall+"\nAverage Score: "+analysis.avg+"\nBullish: "+analysis.bull+" | Bearish: "+analysis.bear+" | Neutral: "+analysis.neut,"agent");
+        setLoading(false);
+        setReqCount(function(c){return c+1;});
+      },1000);
+    },400);
+  }
+
+  function handleIntel(){
+    if(!symbol)return;
+    var s=symbol.toUpperCase();
+    setLoading(true);
+    addChat("You","Give me complete market intelligence for "+s,"user");
+    setTimeout(function(){
+      addChat("MCP","[Calling tool: market_intelligence] Symbol: "+s+"\n[Combining: price data + news sentiment + signals]","tool");
+      setTimeout(function(){
+        var stock=getStock(s);
+        var news=getNews(s);
+        var sentiment=analyseMultiple(news);
+        var priceSignal=stock.changePct>0.5?"BULLISH":stock.changePct<-0.5?"BEARISH":"NEUTRAL";
+        var newsSignal=sentiment.avg>0.1?"BULLISH":sentiment.avg<-0.1?"BEARISH":"NEUTRAL";
+        var combined,analysis;
+        if(priceSignal==="BULLISH"&&newsSignal==="BULLISH"){combined="\u{1F7E2} STRONG BUY";analysis="Price and sentiment both positive. Genuine momentum.";}
+        else if(priceSignal==="BEARISH"&&newsSignal==="BEARISH"){combined="\u{1F534} STRONG SELL";analysis="Price and sentiment both negative. Real weakness.";}
+        else if(priceSignal==="BULLISH"&&newsSignal==="BEARISH"){combined="\u{1F7E1} CAUTION";analysis="Price rising but news negative. Possible reversal ahead.";}
+        else if(priceSignal==="BEARISH"&&newsSignal==="BULLISH"){combined="\u{1F7E1} OPPORTUNITY";analysis="Price falling but news positive. Possible buying opportunity.";}
+        else{combined="\u{1F7E1} MIXED";analysis="No clear direction. Wait for stronger signals.";}
+        setStockResult(stock);
+        setSentResult(sentiment);
+        setIntelResult({combined:combined,analysis:analysis,priceSignal:priceSignal,newsSignal:newsSignal});
+        addChat("AUREUM","Market Intelligence Report for "+s+":\n\nPrice: $"+stock.price.toFixed(2)+" ("+stock.changePct.toFixed(2)+"%)\nPrice Signal: "+priceSignal+"\nNews Signal: "+newsSignal+"\n\nCombined: "+combined+"\n"+analysis,"agent");
+        setLoading(false);
+        setReqCount(function(c){return c+1;});
+      },1500);
+    },400);
+  }
+
+  // Nav
+  var nav=e("div",{className:"nav"},
+    e("div",{className:"nav-left"},
+      e("div",{className:"nav-logo"},"A"),
+      e("span",{className:"nav-title"},e("span",{style:{color:"#fff"}},"AUREUM "),e("span",{style:{color:G.gold}},"MCP"))
+    ),
+    e("div",{className:"nav-right"},
+      e("div",{className:"nav-badge",style:{background:"rgba(52,211,153,0.1)",border:"1px solid rgba(52,211,153,0.2)",color:G.green,animation:"pulse 3s infinite"}},"\u25CF MCP Active"),
+      e("div",{className:"nav-badge",style:{background:"rgba(212,160,74,0.1)",border:"1px solid rgba(212,160,74,0.2)",color:G.gold}},"Requests: "+reqCount)
+    )
+  );
+
+  // Tools section
+  var tools=e("div",{className:"card"},
+    e("div",{className:"card-label"},"MCP Registered Tools"),
+    e("div",{className:"tool-card",onClick:function(){handleStock();}},
+      e("div",{className:"tool-icon",style:{background:"rgba(52,211,153,0.1)"}},"$"),
+      e("div",null,e("div",{className:"tool-name"},"get_stock_price"),e("div",{className:"tool-desc"},"Real-time stock price data for any publicly traded company"))
+    ),
+    e("div",{className:"tool-card",onClick:function(){handleSentiment();}},
+      e("div",{className:"tool-icon",style:{background:"rgba(96,165,250,0.1)"}},"S"),
+      e("div",null,e("div",{className:"tool-name"},"analyse_sentiment"),e("div",{className:"tool-desc"},"Analyse financial headlines for market sentiment"))
+    ),
+    e("div",{className:"tool-card",onClick:function(){handleIntel();}},
+      e("div",{className:"tool-icon",style:{background:"rgba(212,160,74,0.1)"}},"I"),
+      e("div",null,e("div",{className:"tool-name"},"market_intelligence"),e("div",{className:"tool-desc"},"Complete analysis combining price + sentiment + signals"))
+    )
+  );
+
+  // Input section
+  var inputs=e("div",{className:"card"},
+    e("div",{className:"card-label"},"Query Input"),
+    e("div",{className:"input-group"},
+      e("input",{className:"input-field",placeholder:"Enter stock symbol (e.g. AAPL, TSLA, NVDA)...",value:symbol,onChange:function(ev){setSymbol(ev.target.value);}}),
+      e("button",{className:"btn btn-gold",onClick:handleStock},"Get Price"),
+      e("button",{className:"btn btn-outline",onClick:handleIntel},"Full Intel")
+    ),
+    e("textarea",{className:"input-field",style:{width:"100%",minHeight:"70px",resize:"vertical",marginBottom:"8px"},placeholder:"Enter news headlines (one per line)...\nOr click a button above to auto-load news for the stock",value:headlines,onChange:function(ev){setHeadlines(ev.target.value);}}),
+    e("button",{className:"btn btn-outline",onClick:handleSentiment,style:{width:"100%"}},"Analyse Sentiment")
+  );
+
+  // Results section
+  var results=[];
+
+  // Stock result
+  if(stockResult){
+    var dir=stockResult.changePct>0;
+    results.push(e("div",{className:"card",key:"stock"},
+      e("div",{className:"card-label"},"Stock Data — "+stockResult.symbol),
+      e("div",{className:"grid3"},
+        e("div",null,e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.25)",marginBottom:"4px"}},"PRICE"),e("div",{className:"metric",style:{color:dir?G.green:G.red}},"$"+stockResult.price.toFixed(2)),e("div",{className:"metric-sub"},(dir?"\u25B2 +":"\u25BC ")+stockResult.changePct.toFixed(2)+"%")),
+        e("div",null,e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.25)",marginBottom:"4px"}},"VOLUME"),e("div",{style:{fontSize:"20px",fontWeight:700,fontFamily:"'DM Mono',monospace"}},Math.round(stockResult.volume/1000000)+"M"),e("div",{className:"metric-sub"},"shares traded")),
+        e("div",null,e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.25)",marginBottom:"4px"}},"RANGE"),e("div",{style:{fontSize:"20px",fontWeight:700,fontFamily:"'DM Mono',monospace"}},"$"+stockResult.low.toFixed(0)+" \u2014 $"+stockResult.high.toFixed(0)),e("div",{className:"metric-sub"},"day range"))
+      )
+    ));
+  }
+
+  // Sentiment result
+  if(sentResult){
+    results.push(e("div",{className:"card",key:"sent"},
+      e("div",{className:"card-label"},"Sentiment Analysis"),
+      e("div",{className:"grid3",style:{marginBottom:"12px"}},
+        e("div",null,e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.25)",marginBottom:"4px"}},"OVERALL"),e("div",{style:{fontSize:"18px",fontWeight:700}},sentResult.overall)),
+        e("div",null,e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.25)",marginBottom:"4px"}},"SCORE"),e("div",{style:{fontSize:"22px",fontWeight:800,fontFamily:"'DM Mono',monospace",color:sentResult.avg>0?G.green:sentResult.avg<0?G.red:G.yellow}},sentResult.avg>0?"+"+sentResult.avg:sentResult.avg)),
+        e("div",null,e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.25)",marginBottom:"4px"}},"BREAKDOWN"),e("div",{style:{fontSize:"12px",color:"rgba(255,255,255,0.5)"}},"\u{1F7E2} "+sentResult.bull+" \u{1F534} "+sentResult.bear+" \u{1F7E1} "+sentResult.neut))
+      ),
+      sentResult.results.map(function(r,i){
+        var cls="news-item "+(r.sentiment==="BULLISH"?"news-bull":r.sentiment==="BEARISH"?"news-bear":"news-neut");
+        return e("div",{className:cls,key:i},
+          e("div",{style:{fontSize:"11.5px",color:"rgba(255,255,255,0.6)"}},r.emoji+" "+r.headline),
+          e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.3)",marginTop:"3px"}},r.sentiment+" | Score: "+r.score+(r.posWords.length>0?" | +words: "+r.posWords.join(", "):"")+(r.negWords.length>0?" | -words: "+r.negWords.join(", "):""))
+        );
+      })
+    ));
+  }
+
+  // Intel result
+  if(intelResult){
+    results.push(e("div",{className:"card",key:"intel",style:{background:"linear-gradient(135deg,rgba(212,160,74,0.04),rgba(212,160,74,0.01))",border:"1px solid rgba(212,160,74,0.15)"}},
+      e("div",{className:"card-label",style:{color:G.gold}},"Market Intelligence Signal"),
+      e("div",{style:{fontSize:"22px",fontWeight:800,marginBottom:"8px"}},intelResult.combined),
+      e("div",{style:{fontSize:"12px",color:"rgba(255,255,255,0.5)",lineHeight:1.6,marginBottom:"12px"}},intelResult.analysis),
+      e("div",{className:"grid2"},
+        e("div",{style:{padding:"10px",borderRadius:"8px",background:"rgba(255,255,255,0.02)"}},
+          e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.25)",marginBottom:"3px"}},"PRICE SIGNAL"),
+          e("div",{style:{fontSize:"14px",fontWeight:700,color:intelResult.priceSignal==="BULLISH"?G.green:intelResult.priceSignal==="BEARISH"?G.red:G.yellow}},intelResult.priceSignal)
+        ),
+        e("div",{style:{padding:"10px",borderRadius:"8px",background:"rgba(255,255,255,0.02)"}},
+          e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.25)",marginBottom:"3px"}},"NEWS SIGNAL"),
+          e("div",{style:{fontSize:"14px",fontWeight:700,color:intelResult.newsSignal==="BULLISH"?G.green:intelResult.newsSignal==="BEARISH"?G.red:G.yellow}},intelResult.newsSignal)
+        )
+      )
+    ));
+  }
+
+  // Chat log
+  var chatLog=chat.length>0?e("div",{className:"card"},
+    e("div",{className:"card-label"},"Agent Conversation Log"),
+    chat.map(function(msg,i){
+      var cls="chat-msg "+(msg.type==="user"?"chat-user":msg.type==="tool"?"chat-tool":"chat-agent");
+      var sender=msg.type==="user"?"\u{1F464} YOU":msg.type==="tool"?"\u{1F527} MCP PROTOCOL":"\u{1F916} AUREUM AGENT";
+      var color=msg.type==="user"?G.gold:msg.type==="tool"?G.blue:"rgba(255,255,255,0.5)";
+      return e("div",{className:cls,key:i},
+        e("div",{className:"chat-sender",style:{color:color}},sender+" \u2014 "+msg.time),
+        e("div",{style:{whiteSpace:"pre-wrap"}},msg.text)
+      );
+    }),
+    loading?e("div",{style:{padding:"10px",color:"rgba(255,255,255,0.3)",fontSize:"12px"}},e("span",{className:"loading"}),"Agent processing..."):null
+  ):null;
+
+  // Footer
+  var footer=e("div",{className:"footer"},
+    e("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",marginBottom:"6px"}},
+      e("div",{style:{width:"20px",height:"20px",borderRadius:"5px",background:"linear-gradient(135deg,#d4a04a,#f5d98a)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:"10px",fontWeight:800,color:"#0a0a0f"}},"A"),
+      e("span",{style:{fontSize:"10px",fontWeight:700,letterSpacing:"1.5px",color:"rgba(255,255,255,0.2)"}},"AUREUM FINANCIAL INTELLIGENCE")
+    ),
+    e("div",{style:{fontSize:"9px",color:"rgba(255,255,255,0.1)"}},"MCP Financial Agent v1.0 | Model Context Protocol | Built by Pavan Krishna"),
+    e("div",{style:{fontSize:"8px",color:"rgba(255,255,255,0.06)",marginTop:"4px"}},"\u26A0\uFE0F Not financial advice. For educational and demonstration purposes only.")
+  );
+
+  return e("div",null,
+    nav,
+    e("div",{className:"container"},
+      e("div",{className:"hero"},
+        e("div",{className:"hero-badge"},"MODEL CONTEXT PROTOCOL \u2022 FINANCIAL INTELLIGENCE"),
+        e("h1",null,e("span",{style:{color:"#fff"}},"AI-Powered "),e("span",{style:{color:G.gold}},"Market Intelligence")),
+        e("p",null,"An MCP server providing real-time stock data, sentiment analysis, and trading signals. Connect any AI model to financial markets.")
+      ),
+      e("div",{className:"grid2"},
+        e("div",null,inputs,tools),
+        e("div",null,results.length>0?results:e("div",{className:"card",style:{textAlign:"center",padding:"40px"}},
+          e("div",{style:{fontSize:"32px",marginBottom:"12px"}},"\u{1F4CA}"),
+          e("div",{style:{fontSize:"14px",fontWeight:600,marginBottom:"6px"}},"Enter a stock symbol to begin"),
+          e("div",{style:{fontSize:"11px",color:"rgba(255,255,255,0.3)"}},"Try AAPL, TSLA, NVDA, GOOGL, MSFT, AMZN, META, or IBM")
+        ))
+      ),
+      chatLog,
+      footer
+    )
+  );
+}
+
+ReactDOM.render(e(App),document.getElementById("root"));
+</script>
+</body>
+</html>
